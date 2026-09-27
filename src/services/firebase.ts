@@ -9,6 +9,9 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  setPersistence,
+  browserLocalPersistence,
   signOut,
   onAuthStateChanged,
   User,
@@ -109,12 +112,34 @@ export async function testFirestoreConnection(): Promise<boolean> {
 
 // Sign In With Google Popup
 export async function loginWithGoogle(): Promise<User | null> {
+  if (!firebaseConfig?.apiKey || !firebaseConfig?.authDomain) {
+    throw new Error('Configuração do Firebase para autenticação Google não foi encontrada.');
+  }
+
   try {
+    await setPersistence(auth, browserLocalPersistence);
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
-  } catch (error) {
+  } catch (error: any) {
+    const popupBlockedCodes = [
+      'auth/popup-blocked',
+      'auth/cancelled-popup-request',
+      'auth/popup-closed-by-user',
+    ];
+
+    if (popupBlockedCodes.includes(error?.code)) {
+      try {
+        await signInWithRedirect(auth, googleProvider);
+        return null;
+      } catch (redirectError) {
+        console.error('Google Redirect Sign-In Error:', redirectError);
+      }
+    }
+
     console.error('Google Sign-In Error:', error);
-    throw error;
+    throw new Error(
+      'Não foi possível entrar com o Google. Verifique se o domínio da aplicação está autorizado no Firebase e tente novamente.'
+    );
   }
 }
 

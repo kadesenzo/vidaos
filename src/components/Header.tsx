@@ -44,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [dateStr, setDateStr] = useState('');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
     const unsubAuth = auth.onAuthStateChanged((u) => {
@@ -81,6 +82,22 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleGoogleLogin = async () => {
+    setIsAuthLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      console.error('Erro no login do cabeçalho:', error);
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível entrar com o Google. Verifique a configuração do Firebase.'
+      );
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
 
   const formatTimer = (secs: number) => {
     const mins = Math.floor(secs / 60);
@@ -218,12 +235,13 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         ) : (
           <button
-            onClick={() => loginWithGoogle()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
+            onClick={handleGoogleLogin}
+            disabled={isAuthLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all disabled:opacity-70 disabled:cursor-not-allowed"
             title="Fazer Login com Google"
           >
-            <LogIn className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Entrar</span>
+            <LogIn className={`w-3.5 h-3.5 ${isAuthLoading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isAuthLoading ? 'Entrando...' : 'Entrar'}</span>
           </button>
         )}
       </div>
