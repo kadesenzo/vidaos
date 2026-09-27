@@ -10,6 +10,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
+  getRedirectResult,
   setPersistence,
   browserLocalPersistence,
   signOut,
@@ -140,6 +141,16 @@ export async function loginWithGoogle(): Promise<User | null> {
     throw new Error(
       'Não foi possível entrar com o Google. Verifique se o domínio da aplicação está autorizado no Firebase e tente novamente.'
     );
+  }
+}
+
+export async function handleGoogleAuthRedirect(): Promise<User | null> {
+  try {
+    const result = await getRedirectResult(auth);
+    return result?.user ?? null;
+  } catch (error) {
+    console.error('Google Redirect Result Error:', error);
+    throw error;
   }
 }
 

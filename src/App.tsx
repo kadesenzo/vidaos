@@ -21,6 +21,7 @@ import {
   auth,
   testFirestoreConnection,
   fetchUserProfileFromFirestore,
+  handleGoogleAuthRedirect,
 } from './services/firebase';
 
 // Modules
@@ -76,6 +77,13 @@ export default function App() {
   // Validate Firestore connection on boot
   useEffect(() => {
     testFirestoreConnection();
+  }, []);
+
+  // Handle redirect-based Google sign-in when the browser returns from the OAuth flow.
+  useEffect(() => {
+    handleGoogleAuthRedirect().catch((error) => {
+      console.warn('Google redirect auth returned an error:', error);
+    });
   }, []);
 
   // Auth Listener: Check if user already completed onboarding on Firestore or if it's first login
