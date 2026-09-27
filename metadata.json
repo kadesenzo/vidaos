@@ -1,0 +1,6 @@
+{
+  "name": "LIFE OS",
+  "description": "Sistema Operacional Pessoal — Segundo cérebro com plataforma completa de estudos (Academy), tarefas, rotina, hábitos, projetos, finanças e assistente inteligente em estilo iOS 26.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
