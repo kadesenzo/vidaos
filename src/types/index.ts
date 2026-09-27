@@ -50,6 +50,16 @@ export interface UserProfile {
   hasPersonalProjects: boolean;
   primaryGoals: string[];
   forgetReason: string;
+  userId?: string;
+  primarySubjects?: string[];
+  sports?: string[];
+  workoutDaysCount?: string;
+  waterGoalLiters?: string;
+  incomeSources?: string;
+  financialGoal?: string;
+  activeProjectsText?: string;
+  selectedHabits?: string[];
+  enabledModules?: ModuleId[];
   onboardingCompleted: boolean;
   createdAt: string;
   updatedAt: string;

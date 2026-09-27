@@ -43,12 +43,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 }) => {
   const [showMoreSheet, setShowMoreSheet] = useState(false);
 
-  const mainTabs: { id: ModuleId; label: string; icon: React.ReactNode }[] = [
+  const allMainTabs: { id: ModuleId; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Início', icon: <LayoutDashboard className="w-5 h-5" /> },
     { id: 'estudos', label: 'Estudos', icon: <GraduationCap className="w-5 h-5" /> },
     { id: 'tarefas', label: 'Tarefas', icon: <CheckSquare className="w-5 h-5" /> },
     { id: 'projetos', label: 'Projetos', icon: <FolderKanban className="w-5 h-5" /> },
   ];
+
+  const mainTabs = allMainTabs.filter((t) => t.id === 'dashboard' || config.enabledModules[t.id] !== false);
 
   const moreItems: { id: ModuleId; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'assistente', label: 'Assistente NLP', icon: <Bot className="w-5 h-5" />, color: 'from-blue-600/30 to-indigo-600/20' },
@@ -68,7 +70,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     { id: 'calendario', label: 'Calendário', icon: <CalendarDays className="w-5 h-5" />, color: 'from-cyan-500/20 to-sky-500/10' },
     { id: 'ia', label: 'Life AI Tutor', icon: <Bot className="w-5 h-5" />, color: 'from-fuchsia-500/20 to-indigo-500/10' },
     { id: 'configuracoes', label: 'Ajustes', icon: <Settings className="w-5 h-5" />, color: 'from-slate-500/20 to-slate-500/10' },
-  ];
+  ].filter((item) => config.enabledModules[item.id] !== false);
 
   const handleSelectMore = (id: ModuleId) => {
     onSelectModule(id);

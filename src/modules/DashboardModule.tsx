@@ -127,9 +127,25 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
           <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
             {getGreeting()}, {profile.nickname || profile.name || 'Enzo'}.
           </h1>
-          <p className="text-sm text-slate-400 capitalize">
-            {todayStr} • O que está acontecendo na sua vida hoje?
-          </p>
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+            <p className="text-xs text-slate-400 capitalize">
+              {todayStr}
+            </p>
+            <span className="text-slate-600">•</span>
+            <span className="text-[11px] font-mono text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
+              ⏰ Ritmo: Acorda {profile.wakeTime || '06:30'} • Dorme {profile.sleepTime || '23:00'}
+            </span>
+            {profile.isStudent && (
+              <span className="text-[11px] font-mono text-sky-300 bg-sky-500/10 px-2 py-0.5 rounded-md border border-sky-500/20">
+                📚 Estudante
+              </span>
+            )}
+            {profile.isWorker && (
+              <span className="text-[11px] font-mono text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                💼 Empreendedor
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Quick Day Progress Gauge */}
@@ -261,116 +277,136 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
           {/* 📚 ESTUDOS */}
-          <div
-            onClick={() => onNavigateToModule('estudos')}
-            className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-              <GraduationCap className="w-4 h-4" />
+          {config.enabledModules?.estudos !== false && (
+            <div
+              onClick={() => onNavigateToModule('estudos')}
+              className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block">135h estudadas</span>
+                <span className="text-[11px] text-slate-400">📚 Academy & Aulas</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">135h estudadas</span>
-              <span className="text-[11px] text-slate-400">📚 Academy & Aulas</span>
-            </div>
-          </div>
+          )}
 
           {/* 🥋 ATIVIDADE & TREINOS */}
-          <div
-            onClick={() => onNavigateToModule('treinos')}
-            className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
-              <Dumbbell className="w-4 h-4" />
+          {config.enabledModules?.treinos !== false && (
+            <div
+              onClick={() => onNavigateToModule('treinos')}
+              className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                <Dumbbell className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block">
+                  {profile.sports?.[0] || 'Jiu-Jitsu'} 19h
+                </span>
+                <span className="text-[11px] text-slate-400">🥋 Treino programado</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">Jiu-Jitsu 19h</span>
-              <span className="text-[11px] text-slate-400">🥋 Treino programado</span>
-            </div>
-          </div>
+          )}
 
           {/* 💰 DINHEIRO */}
-          <div
-            onClick={() => onNavigateToModule('financas')}
-            className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <Wallet className="w-4 h-4" />
+          {config.enabledModules?.financas !== false && (
+            <div
+              onClick={() => onNavigateToModule('financas')}
+              className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <Wallet className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-emerald-400 block">+R$ 3.5k recebidos</span>
+                <span className="text-[11px] text-slate-400">💰 Fluxo financeiro</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-emerald-400 block">+R$ 3.5k recebidos</span>
-              <span className="text-[11px] text-slate-400">💰 Fluxo financeiro</span>
-            </div>
-          </div>
+          )}
 
           {/* 🚀 PROJETOS */}
-          <div
-            onClick={() => onNavigateToModule('projetos')}
-            className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center">
-              <FolderKanban className="w-4 h-4" />
+          {config.enabledModules?.projetos !== false && (
+            <div
+              onClick={() => onNavigateToModule('projetos')}
+              className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center">
+                <FolderKanban className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block truncate max-w-[120px]">
+                  {profile.activeProjectsText || 'KVB & KAEN'}
+                </span>
+                <span className="text-[11px] text-slate-400">🚀 Projetos ativos</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">KVB & KAEN</span>
-              <span className="text-[11px] text-slate-400">🚀 Projetos ativos</span>
-            </div>
-          </div>
+          )}
 
           {/* 🔥 HÁBITOS */}
-          <div
-            onClick={() => onNavigateToModule('habitos')}
-            className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center">
-              <Flame className="w-4 h-4" />
+          {config.enabledModules?.habitos !== false && (
+            <div
+              onClick={() => onNavigateToModule('habitos')}
+              className="p-4 rounded-3xl ios-glass-card ios-glass-card-hover cursor-pointer border border-white/10 space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                <Flame className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block">14 dias streak</span>
+                <span className="text-[11px] text-slate-400">🔥 Constância</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">14 dias streak</span>
-              <span className="text-[11px] text-slate-400">🔥 Constância</span>
-            </div>
-          </div>
+          )}
 
           {/* 🎯 OBJETIVOS & METAS */}
-          <div
-            onClick={() => onNavigateToModule('metas')}
-            className="p-4 rounded-3xl ios-glass-card border border-white/10 cursor-pointer space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-              <Target className="w-4 h-4" />
+          {config.enabledModules?.metas !== false && (
+            <div
+              onClick={() => onNavigateToModule('metas')}
+              className="p-4 rounded-3xl ios-glass-card border border-white/10 cursor-pointer space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                <Target className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block">78% progresso</span>
+                <span className="text-[11px] text-slate-400">🎯 Meta acadêmica</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">78% progresso</span>
-              <span className="text-[11px] text-slate-400">🎯 Meta acadêmica</span>
-            </div>
-          </div>
+          )}
 
           {/* 📸 GALERIA DA VIDA */}
-          <div
-            onClick={() => onNavigateToModule('galeria')}
-            className="p-4 rounded-3xl ios-glass-card border border-white/10 cursor-pointer space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
-              <ImageIcon className="w-4 h-4" />
+          {config.enabledModules?.galeria !== false && (
+            <div
+              onClick={() => onNavigateToModule('galeria')}
+              className="p-4 rounded-3xl ios-glass-card border border-white/10 cursor-pointer space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                <ImageIcon className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block">4 fotos</span>
+                <span className="text-[11px] text-slate-400">📸 Memória visual</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">4 fotos</span>
-              <span className="text-[11px] text-slate-400">📸 Memória visual</span>
-            </div>
-          </div>
+          )}
 
           {/* 📖 DIÁRIO */}
-          <div
-            onClick={() => onNavigateToModule('diario')}
-            className="p-4 rounded-3xl ios-glass-card border border-white/10 cursor-pointer space-y-2"
-          >
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-              <BookMarked className="w-4 h-4" />
+          {config.enabledModules?.diario !== false && (
+            <div
+              onClick={() => onNavigateToModule('diario')}
+              className="p-4 rounded-3xl ios-glass-card border border-white/10 cursor-pointer space-y-2"
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <BookMarked className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-extrabold text-white block">Hoje registrado</span>
+                <span className="text-[11px] text-slate-400">📖 Diário do dia</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-extrabold text-white block">Hoje registrado</span>
-              <span className="text-[11px] text-slate-400">📖 Diário do dia</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

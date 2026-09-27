@@ -17,6 +17,11 @@ import { QuickCaptureModal } from './components/QuickCaptureModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { NotificationDrawer } from './components/NotificationDrawer';
+import {
+  auth,
+  testFirestoreConnection,
+  fetchUserProfileFromFirestore,
+} from './services/firebase';
 
 // Modules
 import { DashboardModule } from './modules/DashboardModule';
@@ -66,6 +71,67 @@ export default function App() {
     };
     const unsub = StorageService.subscribe(handleStorageChange);
     return unsub;
+  }, []);
+
+  // Validate Firestore connection on boot
+  useEffect(() => {
+    testFirestoreConnection();
+  }, []);
+
+  // Auth Listener: Check if user already completed onboarding on Firestore or if it's first login
+  useEffect(() => {
+    const unsubAuth = auth.onAuthStateChanged(async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const cloudProfile = await fetchUserProfileFromFirestore(firebaseUser.uid);
+          if (cloudProfile && cloudProfile.onboardingCompleted) {
+            // User already completed onboarding on Firestore:
+            // Sync cloud profile, customize enabled modules, and DO NOT show quiz!
+            setProfile(cloudProfile);
+            StorageService.saveProfile(cloudProfile);
+
+            if (cloudProfile.enabledModules && cloudProfile.enabledModules.length > 0) {
+              const updatedModulesMap: Record<string, boolean> = {
+                dashboard: true,
+                configuracoes: true,
+              };
+              cloudProfile.enabledModules.forEach((m) => {
+                updatedModulesMap[m] = true;
+              });
+              const newConfig: AppConfig = {
+                ...config,
+                enabledModules: {
+                  ...config.enabledModules,
+                  ...(updatedModulesMap as any),
+                },
+              };
+              setConfig(newConfig);
+              StorageService.saveConfig(newConfig);
+            }
+            setIsOnboardingOpen(false);
+          } else {
+            // First time logging in (or onboarding not completed):
+            // Show Onboarding Quiz to collect preferences and populate profile!
+            const initialUserDraft: UserProfile = {
+              ...profile,
+              id: firebaseUser.uid,
+              userId: firebaseUser.uid,
+              name: firebaseUser.displayName || 'Usuário',
+              nickname: firebaseUser.displayName?.split(' ')[0] || 'Usuário',
+              email: firebaseUser.email || '',
+              avatarUrl: firebaseUser.photoURL || profile.avatarUrl,
+              onboardingCompleted: false,
+            };
+            setProfile(initialUserDraft);
+            StorageService.saveProfile(initialUserDraft);
+            setIsOnboardingOpen(true);
+          }
+        } catch (error) {
+          console.warn('Error fetching user profile from Firestore:', error);
+        }
+      }
+    });
+    return unsubAuth;
   }, []);
 
   // Global ⌘K / Ctrl+K keyboard shortcut

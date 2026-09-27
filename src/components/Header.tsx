@@ -11,10 +11,15 @@ import {
   Plus,
   Compass,
   CheckCircle2,
+  Cloud,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 import { StorageService } from '../services/storageService';
 import { AppConfig } from '../config/appConfig';
 import { UserProfile, NotificationItem } from '../types';
+import { auth, loginWithGoogle, logoutUser } from '../services/firebase';
+import { User } from 'firebase/auth';
 
 interface HeaderProps {
   config: AppConfig;
@@ -38,6 +43,14 @@ export const Header: React.FC<HeaderProps> = ({
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
+
+  useEffect(() => {
+    const unsubAuth = auth.onAuthStateChanged((u) => {
+      setCurrentUser(u);
+    });
+    return unsubAuth;
+  }, []);
 
   useEffect(() => {
     const updateTime = () => {
@@ -172,18 +185,47 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="text-[10px] text-slate-400 capitalize">{dateStr}</span>
         </div>
 
-        {/* User Avatar */}
-        <button
-          onClick={() => onNavigateToModule('configuracoes')}
-          className="flex items-center gap-2 p-1 rounded-2xl hover:bg-white/5 transition-all group"
-          title="Perfil e Configurações"
-        >
-          <img
-            src={profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-            alt={profile.nickname}
-            className="w-8 h-8 rounded-xl object-cover ring-1 ring-white/20 group-hover:ring-indigo-400 transition-all"
-          />
-        </button>
+        {/* Google Auth / User Account Section */}
+        {currentUser ? (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onNavigateToModule('configuracoes')}
+              className="flex items-center gap-2 p-1 pl-2 pr-1.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group"
+              title={`Conectado como ${currentUser.email}`}
+            >
+              <div className="flex flex-col text-right hidden sm:block">
+                <span className="text-xs font-bold text-white leading-tight">
+                  {currentUser.displayName || profile.nickname}
+                </span>
+                <span className="text-[9px] text-emerald-400 font-mono flex items-center justify-end gap-1">
+                  <Cloud className="w-2.5 h-2.5" />
+                  <span>Nuvem</span>
+                </span>
+              </div>
+              <img
+                src={currentUser.photoURL || profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                alt={profile.nickname}
+                className="w-8 h-8 rounded-xl object-cover ring-1 ring-emerald-500/50 group-hover:ring-emerald-400 transition-all"
+              />
+            </button>
+            <button
+              onClick={() => logoutUser()}
+              className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors hidden sm:block"
+              title="Sair da Conta Google"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => loginWithGoogle()}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md cursor-pointer transition-all"
+            title="Fazer Login com Google"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Entrar</span>
+          </button>
+        )}
       </div>
     </header>
   );
